@@ -1,0 +1,260 @@
+name: Build and release
+
+on: [ create ]
+
+env:
+  PHP_VERSION: 8.1
+  MSODBC_SQL_APK_URI: https://download.microsoft.com/download/b/9/f/b9f3cce4-3925-46d4-9f46-da08869c6486/msodbcsql18_18.1.1.1-1_amd64.apk
+  MSSQL_TOOLS_APK_URI: https://download.microsoft.com/download/b/9/f/b9f3cce4-3925-46d4-9f46-da08869c6486/mssql-tools18_18.1.1.1-1_amd64.apk
+  MSODBC_SQL_SIG_URI: https://download.microsoft.com/download/b/9/f/b9f3cce4-3925-46d4-9f46-da08869c6486/msodbcsql18_18.1.1.1-1_amd64.sig
+  MSSQL_TOOLS_SIG_URI: https://download.microsoft.com/download/b/9/f/b9f3cce4-3925-46d4-9f46-da08869c6486/mssql-tools18_18.1.1.1-1_amd64.sig
+  REGISTRY: ghcr.io
+  IMAGE_NAME: waldhacker/pseudify
+
+jobs:
+  code-quality:
+    name: Check code quality
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup PHP version ${{ env.PHP_VERSION }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          tools: composer:v2
+
+      - name: Get composer cache directory
+        id: composer_cache
+        working-directory: ./src
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer_cache.outputs.dir }}
+          key: ${{ runner.os }}-${{ env.PHP_VERSION }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-${{ env.PHP_VERSION }}-composer-
+
+      - name: Environment check
+        run: |
+          php --version
+          composer --version
+
+      - name: Install dependencies
+        working-directory: ./src
+        run: composer install --no-progress --no-suggest --optimize-autoloader
+
+      - name: Composer normalize
+        working-directory: ./src
+        run: composer run composer:normalize:check
+
+      - name: CGL
+        working-directory: ./src
+        run: composer run cgl:check
+
+      - name: Psalm
+        working-directory: ./src
+        run: composer run psalm
+
+      - name: PHPStan
+        working-directory: ./src
+        run: composer run stan
+
+  tests:
+    name: Application tests
+
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Prepare test environment
+        run: |
+          rm -f ./.ddev/docker-compose.docker-container.yaml
+
+      - name: Install ddev
+        uses: jonaseberle/github-action-setup-ddev@v1
+
+      - name: Run tests
+        run: |
+          ddev exec composer install
+          ddev exec composer test:prepare
+          ddev exec composer test:coverage
+
+      - name: Upload coverage xml
+        uses: actions/upload-artifact@v3
+        with:
+          name: pseudify-coverage
+          path: ./.build/coverage/coverage.xml
+
+  build-phar-binary:
+    name: Build phar binary
+
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup PHP version ${{ env.PHP_VERSION }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          tools: composer:v2
+
+      - name: Get composer cache directory
+        working-directory: ./src
+        id: composer_cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer_cache.outputs.dir }}
+          key: ${{ runner.os }}-${{ env.PHP_VERSION }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-${{ env.PHP_VERSION }}-composer-
+
+      - name: Environment check
+        run: |
+          php --version
+          composer --version
+
+      - name: Build
+        run: ./build/build-phar.sh
+
+      - name: Upload phar binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: pseudify-phar
+          path: ./.build/phar/dist/pseudify
+
+  build-and-push-docker-image:
+    name: Build and push docker image
+
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [tests, code-quality, build-phar-binary]
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install deps
+        run: DEBIAN_FRONTEND=noninteractive sudo apt-get install -y -o Dpkg::Options::="--force-confnew" --no-install-recommends rsync
+
+      - name: Copy files
+        run: |
+          mkdir -p ./.build/docker/context/
+          rsync -ravq ./build/docker/ ./.build/docker/context/
+
+      - name: Download phar binary
+        uses: actions/download-artifact@v3
+        with:
+          name: pseudify-phar
+          path: ./.build/docker/context
+
+      - name: Show build context
+        run: ls -la ./.build/docker/context/
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to the container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags) for docker
+        id: docker_metadata
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          file: ./build/Dockerfile
+          context: ./.build/docker/context
+          build-args: |
+            PHP_VERSION=${{ env.PHP_VERSION }}
+            MSODBC_SQL_APK_URI=${{ env.MSODBC_SQL_APK_URI }}
+            MSSQL_TOOLS_APK_URI=${{ env.MSSQL_TOOLS_APK_URI }}
+            MSODBC_SQL_SIG_URI=${{ env.MSODBC_SQL_SIG_URI }}
+            MSSQL_TOOLS_SIG_URI=${{ env.MSSQL_TOOLS_SIG_URI }}
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.docker_metadata.outputs.tags }}
+          labels: ${{ steps.docker_metadata.outputs.labels }}
+
+  create-release:
+    name: Create release
+
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [tests, code-quality, build-phar-binary]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download phar binary
+        uses: actions/download-artifact@v3
+        with:
+          name: pseudify-phar
+          path: ./.build/artifacts/
+
+      - name: Download coverage
+        uses: actions/download-artifact@v3
+        with:
+          name: pseudify-coverage
+          path: ./.build/artifacts/
+
+      - name: Show artifacts
+        run: ls -la ./.build/artifacts/
+
+      - name: Get test coverage
+        id: test_coverage
+        run: |
+          ALL_STATEMENTS=$(cat ./.build/artifacts/coverage.xml | grep -E '<metrics files="' | grep -Eo 'statements="[0-9]+" co' | grep -Eo -w '[0-9]+')
+          COVERED_STATEMENTS=$(cat ./.build/artifacts/coverage.xml | grep -E '<metrics files="' | grep -Eo 'coveredstatements="[0-9]+" el' | grep -Eo -w '[0-9]+')
+          COVERAGE=$(awk "BEGIN {printf \"%.2f\", 100 / $ALL_STATEMENTS * $COVERED_STATEMENTS}")
+          echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Code coverage: ${{ steps.test_coverage.outputs.coverage }}%
+          draft: false
+          prerelease: false   
+
+      - name: Upload phar binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./.build/artifacts/pseudify
+          asset_name: pseudify.phar
+          asset_content_type: application/octet-stream

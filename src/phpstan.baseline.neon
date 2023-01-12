@@ -1,0 +1,51 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Method Waldhacker\\\\Pseudify\\\\Core\\\\Database\\\\ConnectionManager\\:\\:getConnection\\(\\) should return Doctrine\\\\DBAL\\\\Connection but returns object\\.$#"
+			count: 1
+			path: src/Database/ConnectionManager.php
+
+		-
+			message: "#^Method Waldhacker\\\\Pseudify\\\\Core\\\\Database\\\\ConnectionManager\\:\\:getConnections\\(\\) should return array\\<Doctrine\\\\DBAL\\\\Connection\\> but returns array\\<string, object\\>\\.$#"
+			count: 1
+			path: src/Database/ConnectionManager.php
+
+		-
+			message: "#^Parameter \\#1 \\$separator of function explode expects non\\-empty\\-string, string given\\.$#"
+			count: 1
+			path: src/Database/Query.php
+
+		-
+			message: "#^Method Waldhacker\\\\Pseudify\\\\Core\\\\Processor\\\\Encoder\\\\EncoderInterface\\:\\:decode\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: src/Processor/Encoder/EncoderInterface.php
+
+		-
+			message: "#^Method Waldhacker\\\\Pseudify\\\\Core\\\\Processor\\\\Encoder\\\\EncoderInterface\\:\\:decode\\(\\) has parameter \\$data with no type specified\\.$#"
+			count: 1
+			path: src/Processor/Encoder/EncoderInterface.php
+
+		-
+			message: "#^Method Waldhacker\\\\Pseudify\\\\Core\\\\Processor\\\\Encoder\\\\EncoderInterface\\:\\:encode\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: src/Processor/Encoder/EncoderInterface.php
+
+		-
+			message: "#^Method Waldhacker\\\\Pseudify\\\\Core\\\\Processor\\\\Encoder\\\\EncoderInterface\\:\\:encode\\(\\) has parameter \\$data with no type specified\\.$#"
+			count: 1
+			path: src/Processor/Encoder/EncoderInterface.php
+
+		-
+			message: "#^Method Waldhacker\\\\Pseudify\\\\Core\\\\Processor\\\\Processing\\\\DataProcessing\\:\\:getIdentifier\\(\\) should return string but returns string\\|null\\.$#"
+			count: 1
+			path: src/Processor/Processing/DataProcessing.php
+
+		-
+			message: "#^Call to an undefined method Waldhacker\\\\Pseudify\\\\Core\\\\Faker\\\\Faker\\:\\:ipv4\\(\\)\\.$#"
+			count: 1
+			path: src/Processor/Processing/Pseudonymize/DataManipulatorPreset.php
+
+		-
+			message: "#^Call to an undefined method Waldhacker\\\\Pseudify\\\\Core\\\\Faker\\\\Faker\\:\\:ipv6\\(\\)\\.$#"
+			count: 1
+			path: src/Processor/Processing/Pseudonymize/DataManipulatorPreset.php

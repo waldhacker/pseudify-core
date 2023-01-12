@@ -1,0 +1,17 @@
+doctrine:
+  dbal:
+    connections:
+      default:
+        driver: '%db_driver%'
+        host: '%db_host%'
+        port: '%db_port%'
+        user: '%db_user%'
+        password: '%db_password%'
+        dbname: '%db_dbname%'
+        path: '%db_dbname%'
+        charset: '%db_charset%'
+        server_version: '%db_version%'
+        options:
+          TrustServerCertificate: '%db_ssl_insecure%'
+        mapping_types:
+          _text: text

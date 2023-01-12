@@ -1,0 +1,52 @@
+parameters:
+  env(PSEUDIFY_DATABASE_DRIVER): pdo_mysql
+  env(PSEUDIFY_DATABASE_HOST):
+  env(PSEUDIFY_DATABASE_PORT):
+  env(PSEUDIFY_DATABASE_USER):
+  env(PSEUDIFY_DATABASE_PASSWORD):
+  env(PSEUDIFY_DATABASE_SCHEMA):
+  env(PSEUDIFY_DATABASE_CHARSET): utf8mb4
+  env(PSEUDIFY_DATABASE_VERSION):
+  env(PSEUDIFY_DATABASE_SSL_INSECURE): '0'
+  env(PSEUDIFY_FAKER_LOCALE): en_US
+
+  db_driver: '%env(PSEUDIFY_DATABASE_DRIVER)%'
+  db_host: '%env(PSEUDIFY_DATABASE_HOST)%'
+  db_port: '%env(PSEUDIFY_DATABASE_PORT)%'
+  db_user: '%env(PSEUDIFY_DATABASE_USER)%'
+  db_password: '%env(PSEUDIFY_DATABASE_PASSWORD)%'
+  db_dbname: '%env(PSEUDIFY_DATABASE_SCHEMA)%'
+  db_path: '%env(PSEUDIFY_DATABASE_SCHEMA)%'
+  db_charset: '%env(PSEUDIFY_DATABASE_CHARSET)%'
+  db_version: '%env(PSEUDIFY_DATABASE_VERSION)%'
+  db_ssl_insecure: '%env(PSEUDIFY_DATABASE_SSL_INSECURE)%'
+
+  faker_locale: '%env(PSEUDIFY_FAKER_LOCALE)%'
+
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  Faker\Factory: ~
+
+  Faker\Generator:
+    factory: ['Faker\Factory', 'create']
+    arguments:
+      $locale: '%faker_locale%'
+
+  Waldhacker\Pseudify\Core\:
+    resource: '../src'
+    exclude:
+      - '../src/DependencyInjection'
+      - '../src/Kernel.php'
+
+  Waldhacker\Pseudify\Core\Configuration\Configuration:
+    arguments:
+      $secret: '%kernel.secret%'
+
+  Waldhacker\Pseudify\Core\Faker\Faker:
+    arguments:
+      $source: ~
+      $scope: ~
+      $faker: '@Faker\Generator'

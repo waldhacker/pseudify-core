@@ -1,0 +1,14 @@
+version: '3.7'
+
+services:
+  mssql_2017:
+    container_name: ddev-${DDEV_SITENAME}-mssql_2017
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: $DDEV_APPROOT
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: 'pseudify(!)w4ldh4ck3r'
+    ports:
+      - "10201:1433"

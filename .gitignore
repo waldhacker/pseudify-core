@@ -1,0 +1,8 @@
+.build/
+build/development/userdata/*
+!build/development/userdata/.gitkeep
+src/.composer.lock
+src/bin/*
+!/src/bin/pseudify
+src/public/
+src/vendor/

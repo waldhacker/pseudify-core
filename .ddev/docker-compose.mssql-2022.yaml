@@ -1,0 +1,14 @@
+version: '3.7'
+
+services:
+  mssql_2022:
+    container_name: ddev-${DDEV_SITENAME}-mssql_2022
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: $DDEV_APPROOT
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: 'pseudify(!)w4ldh4ck3r'
+    ports:
+      - "10203:1433"

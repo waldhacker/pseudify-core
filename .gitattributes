@@ -1,0 +1,57 @@
+*.bat text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.tmpl text eol=lf
+*.less text eol=lf
+*.scss text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.php text eol=lf
+*.rst text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.ts text eol=lf
+*.typoscript text eol=lf
+*.xlf text eol=lf
+*.sql text eol=lf
+*.t3s text eol=lf
+*.txt text eol=lf
+*.sh text eol=lf
+.env text eol=lf
+.env.* text eol=lf
+
+.build/ export-ignore
+.ddev/ export-ignore
+.gitattributes export-ignore
+.github/ export-ignore
+.gitignore export-ignore
+build/ export-ignore
+src/.composer.lock export-ignore
+src/.env export-ignore
+src/.gitignore export-ignore
+src/.php-cs-fixer.dist.php export-ignore
+src/.php-cs-fixer.php export-ignore
+src/.php-cs-fixer.cache export-ignore
+src/.phpunit.result.cache export-ignore
+src/bin/console export-ignore
+src/bin/doctrine-dbal export-ignore
+src/bin/patch-type-declarations export-ignore
+src/bin/php-cs-fixer export-ignore
+src/bin/php-parse export-ignore
+src/bin/phpunit export-ignore
+src/bin/psalm export-ignore
+src/bin/psalm-language-server export-ignore
+src/bin/psalm-plugin export-ignore
+src/bin/psalm-refactor export-ignore
+src/bin/psalter export-ignore
+src/bin/simple-phpunit export-ignore
+src/bin/sql-formatter export-ignore
+src/bin/validate-json export-ignore
+src/bin/var-dump-server export-ignore
+src/bin/yaml-lint export-ignore
+src/phpunit.xml export-ignore
+src/phpunit.xml.dist export-ignore
+src/public/ export-ignore
+src/tests/ export-ignore
+src/vendor/ export-ignore

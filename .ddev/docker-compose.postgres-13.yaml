@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  postgres_13:
+    container_name: ddev-${DDEV_SITENAME}-postgres_13
+    image: postgres:13
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: $DDEV_APPROOT
+    environment:
+      POSTGRES_PASSWORD: 'pseudify(!)w4ldh4ck3r'
+    ports:
+      - "10406:5432"

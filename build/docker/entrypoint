@@ -1,0 +1,59 @@
+#!/bin/bash
+set -e
+
+OLD_USER_UID=`id -u pseudify`
+OLD_USER_GID=`getent group pseudify | awk -F: '{printf "%d", $3}'`
+
+# if: HOSTUSER_UID is not set and /data is a directory
+# then: determine HOSTUSER_UID by the user of /data (the host user id)
+if [ -z ${HOSTUSER_UID+x} ] && [ -d /data ]; then
+    HOSTUSER_UID=`stat -c "%u" /data`
+fi
+
+# if: HOSTUSER_GID is not set and /data is a directory
+# then: determine HOSTUSER_GID by the group of /data (the host user group id)
+if [ -z ${HOSTUSER_GID+x} ] && [ -d /data ]; then
+    HOSTUSER_GID=`stat -c "%g" /data`
+fi
+
+# note: if HOSTUSER_UID / HOSTUSER_GID is 0, it is probably a windows user
+MAYBEUSER_UID=`getent passwd $HOSTUSER_UID` || MAYBEUSER_UID=""
+MAYBEUSER_GID=`getent group $HOSTUSER_GID` || MAYBEUSER_GID=""
+
+if [ "$HOSTUSER_UID" -gt "0" ]; then
+    # unix
+    # if a user within the container has already the id HOSTUSER_UID
+    if [ "$HOSTUSER_UID" -ne "$OLD_USER_UID" ] && [ ! -z "$MAYBEUSER_UID" ]; then
+        echo "There is already a user with the uid $HOSTUSER_UID in the container!".
+        echo "You need to change your host user id. Sorry!".
+        echo "Tip: Your host user id should be greater than 410 to avoid this error.".
+        exit 1;
+    fi
+
+    # if a user group within the container has already the id HOSTUSER_GID
+    if [ "$HOSTUSER_GID" -ne "$OLD_USER_GID" ] && [ ! -z "$MAYBEUSER_GID" ]; then
+        echo "There is already a user group with the uid $HOSTUSER_GID in the container!".
+        echo "You need to change your host user group id. Sorry!".
+        echo "Tip: Your host user group id should be greater than 410 to avoid this error.".
+        exit 1;
+    fi
+
+    ARGUMENTS="$@"
+    exec sudo -E /bin/sh -c " \
+        usermod -u $HOSTUSER_UID pseudify > /dev/null \
+        && groupmod -g $HOSTUSER_GID pseudify > /dev/null \
+        && usermod -g $HOSTUSER_GID pseudify > /dev/null \
+        && find /home/pseudify \( -not -user $HOSTUSER_UID -o -not -group $HOSTUSER_GID \) -print0 | sudo xargs -0 -n1 -I{} chown -h $HOSTUSER_UID:$HOSTUSER_GID {} || true \
+        && if [[ \"$ARGUMENTS\" =~ '--data' ]]; then \
+            exec sudo -E -H -u pseudify php /opt/pseudify/pseudify $ARGUMENTS; \
+        else \
+            exec sudo -E -H -u pseudify php /opt/pseudify/pseudify $ARGUMENTS --data /data; \
+        fi \
+    "
+else
+    if [[ "$@" =~ '--data' ]]; then
+        exec php /opt/pseudify/pseudify "$@"
+    else
+        exec php /opt/pseudify/pseudify "$@" --data /data
+    fi
+fi

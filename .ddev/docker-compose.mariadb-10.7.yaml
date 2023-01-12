@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  mariadb_10_7:
+    container_name: ddev-${DDEV_SITENAME}-mariadb_10_7
+    image: mariadb:10.7
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: $DDEV_APPROOT
+    environment:
+      MYSQL_ROOT_PASSWORD: 'pseudify(!)w4ldh4ck3r'
+    ports:
+      - "10106:3306"

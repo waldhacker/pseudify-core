@@ -1,0 +1,14 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  Waldhacker\Pseudify\Core\Tests\Application\Profiles\Fixtures\:
+    resource: '../tests/Application/Profiles/Fixtures/'
+
+  Faker\Generator:
+    factory: ['Faker\Factory', 'create']
+    arguments:
+      $locale: '%faker_locale%'
+    calls:
+      - seed: [1234]

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<files psalm-version="4.30.0@d0bc6e25d89f649e4f36a534f330f8bb4643dd69">
+  <file src="src/Command/DebugAnalyzeProfileCommand.php">
+    <DeprecatedMethod occurrences="2">
+      <code>getName</code>
+      <code>getName</code>
+    </DeprecatedMethod>
+  </file>
+  <file src="src/Command/DebugPseudonymizeProfileCommand.php">
+    <DeprecatedMethod occurrences="1">
+      <code>getName</code>
+    </DeprecatedMethod>
+  </file>
+  <file src="src/Command/DebugTableSchemaInfoCommand.php">
+    <DeprecatedMethod occurrences="1">
+      <code>getName</code>
+    </DeprecatedMethod>
+  </file>
+  <file src="src/Command/InformationCommand.php">
+    <DeprecatedMethod occurrences="1">
+      <code>getName</code>
+    </DeprecatedMethod>
+    <InternalMethod occurrences="2">
+      <code>getMap</code>
+      <code>getParams</code>
+    </InternalMethod>
+  </file>
+  <file src="src/Database/ConnectionManager.php">
+    <LessSpecificReturnStatement occurrences="2">
+      <code>$this-&gt;doctrine-&gt;getConnection($this-&gt;connectionName)</code>
+      <code>$this-&gt;doctrine-&gt;getConnections()</code>
+    </LessSpecificReturnStatement>
+    <MoreSpecificReturnType occurrences="2">
+      <code>Connection</code>
+      <code>Connection[]</code>
+    </MoreSpecificReturnType>
+  </file>
+  <file src="src/Processor/Processing/DataProcessing.php">
+    <InvalidNullableReturnType occurrences="1">
+      <code>string</code>
+    </InvalidNullableReturnType>
+    <NullableReturnStatement occurrences="1">
+      <code>$this-&gt;identifier</code>
+    </NullableReturnStatement>
+  </file>
+  <file src="src/Profile/Analyze/TableDefinitionAutoConfiguration.php">
+    <DeprecatedMethod occurrences="1">
+      <code>getName</code>
+    </DeprecatedMethod>
+  </file>
+</files>

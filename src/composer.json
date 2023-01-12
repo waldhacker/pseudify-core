@@ -1,0 +1,328 @@
+{
+    "name": "waldhacker/pseudify",
+    "description": "pseudify - the database pseudonymizer",
+    "license": [
+        "GPL-2.0-or-later"
+    ],
+    "type": "library",
+    "authors": [
+        {
+            "name": "waldhacker",
+            "email": "hello@waldhacker.dev",
+            "homepage": "https://waldhacker.dev",
+            "role": "Developer"
+        }
+    ],
+    "homepage": "https://github.com/waldhacker/pseudify-core/",
+    "support": {
+        "issues": "https://github.com/waldhacker/pseudify-core/issues"
+    },
+    "require": {
+        "doctrine/dbal": "^3",
+        "doctrine/doctrine-bundle": "^2.7",
+        "fakerphp/faker": "^1.20",
+        "symfony/console": "^6.1",
+        "symfony/dotenv": "^6.1",
+        "symfony/expression-language": "^6.1",
+        "symfony/flex": "^2.2",
+        "symfony/framework-bundle": "^6.1",
+        "symfony/serializer": "^6.1",
+        "symfony/string": "^6.1",
+        "symfony/yaml": "^6.1"
+    },
+    "require-dev": {
+        "dama/doctrine-test-bundle": "^7.1",
+        "ergebnis/composer-normalize": "^2.28",
+        "friendsofphp/php-cs-fixer": "^3.13",
+        "phpstan/phpstan": "^1.9",
+        "roave/security-advisories": "dev-latest",
+        "symfony/phpunit-bridge": "^6.1",
+        "vimeo/psalm": "^4.30"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "Waldhacker\\Pseudify\\Core\\": [
+                "src/"
+            ]
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Waldhacker\\Pseudify\\Core\\Tests\\": "tests/"
+        }
+    },
+    "bin": [
+        "bin/pseudify"
+    ],
+    "config": {
+        "allow-plugins": {
+            "ergebnis/composer-normalize": true,
+            "symfony/flex": true
+        },
+        "bin-dir": "bin",
+        "sort-packages": true
+    },
+    "extra": {
+        "composer-normalize": {
+            "indent-size": 4,
+            "indent-style": "space"
+        },
+        "symfony": {
+            "docker": false
+        }
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        },
+        "cgl:check": [
+            "php-cs-fixer --verbose --dry-run fix"
+        ],
+        "cgl:fix": [
+            "php-cs-fixer --verbose fix"
+        ],
+        "composer:normalize:check": [
+            "@composer normalize --dry-run"
+        ],
+        "composer:normalize:fix": [
+            "@composer normalize"
+        ],
+        "psalm": [
+            "psalm"
+        ],
+        "psalm:gen-baseline": [
+            "psalm --set-baseline=psalm-baseline.xml"
+        ],
+        "stan": [
+            "phpstan analyze"
+        ],
+        "stan:gen-baseline": [
+            "phpstan analyze --generate-baseline phpstan.baseline.neon"
+        ],
+        "test:build:report": [
+            "cd vendor/bin/.phpunit/phpunit && phpdbg -d memory_limit=1024M -qrr vendor/bin/phpunit-merger coverage ../../../../../.build/coverage/objects/php/ --html=../../../../../.build/coverage/html/ ../../../../../.build/coverage/coverage.xml"
+        ],
+        "test:coverage": [
+            "@test:unit",
+            "@test:functional",
+            "@test:build:report"
+        ],
+        "test:functional": [
+            "@test:functional:mariadb:10.2:utf8mb4",
+            "@test:functional:mariadb:10.3:utf8mb4",
+            "@test:functional:mariadb:10.4:utf8mb4",
+            "@test:functional:mariadb:10.5:utf8mb4",
+            "@test:functional:mariadb:10.6:utf8mb4",
+            "@test:functional:mariadb:10.7:utf8mb4",
+            "@test:functional:mariadb:10.8:utf8mb4",
+            "@test:functional:mariadb:10.9:utf8mb4",
+            "@test:functional:mssql:2017:utf8",
+            "@test:functional:mssql:2019:utf8",
+            "@test:functional:mssql:2022:utf8",
+            "@test:functional:mysql:5.6:utf8mb4",
+            "@test:functional:mysql:5.7:utf8mb4",
+            "@test:functional:mysql:8.0:latin1",
+            "@test:functional:mysql:8.0:latin2",
+            "@test:functional:mysql:8.0:utf8",
+            "@test:functional:mysql:8.0:utf8mb4",
+            "@test:functional:postgres:10:utf8",
+            "@test:functional:postgres:11:utf8",
+            "@test:functional:postgres:12:utf8",
+            "@test:functional:postgres:13:utf8",
+            "@test:functional:postgres:14:utf8",
+            "@test:functional:postgres:15:utf8",
+            "@test:functional:postgres:9.5:utf8",
+            "@test:functional:postgres:9.6:utf8",
+            "@test:functional:sqlite:3:utf8"
+        ],
+        "test:functional:mariadb:10.2:utf8mb4": [
+            "echo '\n[TEST]: mariadb:10.2:utf8mb4\n'",
+            "mariadb -h mariadb_10_2 -uroot < ../build/tests/mariadb/10.2/init.sql >/dev/null 2>&1",
+            "mariadb -h mariadb_10_2 -uroot pseudify_utf8mb4 < ../build/tests/mariadb/10.2/data_pseudify_utf8mb4.sql >/dev/null 2>&1",
+            "cp ../build/tests/mariadb/10.2/.env.utf8mb4 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-mariadb-10.2-utf8mb4.php"
+        ],
+        "test:functional:mariadb:10.3:utf8mb4": [
+            "echo '\n[TEST]: mariadb:10.3:utf8mb4\n'",
+            "mariadb -h mariadb_10_3 -uroot < ../build/tests/mariadb/10.3/init.sql >/dev/null 2>&1",
+            "mariadb -h mariadb_10_3 -uroot pseudify_utf8mb4 < ../build/tests/mariadb/10.3/data_pseudify_utf8mb4.sql >/dev/null 2>&1",
+            "cp ../build/tests/mariadb/10.3/.env.utf8mb4 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-mariadb-10.3-utf8mb4.php"
+        ],
+        "test:functional:mariadb:10.4:utf8mb4": [
+            "echo '\n[TEST]: mariadb:10.4:utf8mb4\n'",
+            "mariadb -h mariadb_10_4 -uroot < ../build/tests/mariadb/10.4/init.sql >/dev/null 2>&1",
+            "mariadb -h mariadb_10_4 -uroot pseudify_utf8mb4 < ../build/tests/mariadb/10.4/data_pseudify_utf8mb4.sql >/dev/null 2>&1",
+            "cp ../build/tests/mariadb/10.4/.env.utf8mb4 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-mariadb-10.4-utf8mb4.php"
+        ],
+        "test:functional:mariadb:10.5:utf8mb4": [
+            "echo '\n[TEST]: mariadb:10.5:utf8mb4\n'",
+            "mariadb -h mariadb_10_5 -uroot < ../build/tests/mariadb/10.5/init.sql >/dev/null 2>&1",
+            "mariadb -h mariadb_10_5 -uroot pseudify_utf8mb4 < ../build/tests/mariadb/10.5/data_pseudify_utf8mb4.sql >/dev/null 2>&1",
+            "cp ../build/tests/mariadb/10.5/.env.utf8mb4 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-mariadb-10.5-utf8mb4.php"
+        ],
+        "test:functional:mariadb:10.6:utf8mb4": [
+            "echo '\n[TEST]: mariadb:10.6:utf8mb4\n'",
+            "mariadb -h mariadb_10_6 -uroot < ../build/tests/mariadb/10.6/init.sql >/dev/null 2>&1",
+            "mariadb -h mariadb_10_6 -uroot pseudify_utf8mb4 < ../build/tests/mariadb/10.6/data_pseudify_utf8mb4.sql >/dev/null 2>&1",
+            "cp ../build/tests/mariadb/10.6/.env.utf8mb4 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-mariadb-10.6-utf8mb4.php"
+        ],
+        "test:functional:mariadb:10.7:utf8mb4": [
+            "echo '\n[TEST]: mariadb:10.7:utf8mb4\n'",
+            "mariadb -h mariadb_10_7 -uroot < ../build/tests/mariadb/10.7/init.sql >/dev/null 2>&1",
+            "mariadb -h mariadb_10_7 -uroot pseudify_utf8mb4 < ../build/tests/mariadb/10.7/data_pseudify_utf8mb4.sql >/dev/null 2>&1",
+            "cp ../build/tests/mariadb/10.7/.env.utf8mb4 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-mariadb-10.7-utf8mb4.php"
+        ],
+        "test:functional:mariadb:10.8:utf8mb4": [
+            "echo '\n[TEST]: mariadb:10.8:utf8mb4\n'",
+            "mariadb -h mariadb_10_8 -uroot < ../build/tests/mariadb/10.8/init.sql >/dev/null 2>&1",
+            "mariadb -h mariadb_10_8 -uroot pseudify_utf8mb4 < ../build/tests/mariadb/10.8/data_pseudify_utf8mb4.sql >/dev/null 2>&1",
+            "cp ../build/tests/mariadb/10.8/.env.utf8mb4 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-mariadb-10.8-utf8mb4.php"
+        ],
+        "test:functional:mariadb:10.9:utf8mb4": [
+            "echo '\n[TEST]: mariadb:10.9:utf8mb4\n'",
+            "mariadb -h mariadb_10_9 -uroot < ../build/tests/mariadb/10.9/init.sql >/dev/null 2>&1",
+            "mariadb -h mariadb_10_9 -uroot pseudify_utf8mb4 < ../build/tests/mariadb/10.9/data_pseudify_utf8mb4.sql >/dev/null 2>&1",
+            "cp ../build/tests/mariadb/10.9/.env.utf8mb4 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-mariadb-10.9-utf8mb4.php"
+        ],
+        "test:functional:mssql:2017:utf8": [
+            "echo '\n[TEST]: mssql:2017:utf8\n'",
+            "/opt/mssql-tools/bin/sqlcmd -C -S mssql_2017 -U sa -P 'pseudify(!)w4ldh4ck3r' -i ../build/tests/mssql/2017/init.sql >/dev/null 2>&1",
+            "/opt/mssql-tools/bin/sqlcmd -C -S mssql_2017 -U pseudify -P 'pseudify(!)w4ldh4ck3r' -d pseudify -i ../build/tests/mssql/2017/data_pseudify.sql >/dev/null 2>&1",
+            "cp ../build/tests/mssql/2017/.env.utf8 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-mssql-2017-utf8.php"
+        ],
+        "test:functional:mssql:2019:utf8": [
+            "echo '\n[TEST]: mssql:2019:utf8\n'",
+            "/opt/mssql-tools/bin/sqlcmd -C -S mssql_2019 -U sa -P 'pseudify(!)w4ldh4ck3r' -i ../build/tests/mssql/2019/init.sql >/dev/null 2>&1",
+            "/opt/mssql-tools/bin/sqlcmd -C -S mssql_2019 -U pseudify -P 'pseudify(!)w4ldh4ck3r' -d pseudify -i ../build/tests/mssql/2019/data_pseudify.sql >/dev/null 2>&1",
+            "cp ../build/tests/mssql/2019/.env.utf8 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-mssql-2019-utf8.php"
+        ],
+        "test:functional:mssql:2022:utf8": [
+            "echo '\n[TEST]: mssql:2022:utf8\n'",
+            "/opt/mssql-tools/bin/sqlcmd -C -S mssql_2022 -U sa -P 'pseudify(!)w4ldh4ck3r' -i ../build/tests/mssql/2022/init.sql >/dev/null 2>&1",
+            "/opt/mssql-tools/bin/sqlcmd -C -S mssql_2022 -U pseudify -P 'pseudify(!)w4ldh4ck3r' -d pseudify -i ../build/tests/mssql/2022/data_pseudify.sql >/dev/null 2>&1",
+            "cp ../build/tests/mssql/2022/.env.utf8 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-mssql-2022-utf8.php"
+        ],
+        "test:functional:mysql:5.6:utf8mb4": [
+            "echo '\n[TEST]: mysql:5.6:utf8mb4\n'",
+            "mysql -h mysql_5_6 -uroot < ../build/tests/mysql/5.6/init.sql >/dev/null 2>&1",
+            "mysql -h mysql_5_6 -uroot pseudify_utf8mb4 < ../build/tests/mysql/5.6/data_pseudify_utf8mb4.sql >/dev/null 2>&1",
+            "cp ../build/tests/mysql/5.6/.env.utf8mb4 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-mysql-5.6-utf8mb4.php"
+        ],
+        "test:functional:mysql:5.7:utf8mb4": [
+            "echo '\n[TEST]: mysql:5.7:utf8mb4\n'",
+            "mysql -h mysql_5_7 -uroot < ../build/tests/mysql/5.7/init.sql >/dev/null 2>&1",
+            "mysql -h mysql_5_7 -uroot pseudify_utf8mb4 < ../build/tests/mysql/5.7/data_pseudify_utf8mb4.sql >/dev/null 2>&1",
+            "cp ../build/tests/mysql/5.7/.env.utf8mb4 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-mysql-5.7-utf8mb4.php"
+        ],
+        "test:functional:mysql:8.0:latin1": [
+            "echo '\n[TEST]: mysql:8.0:latin1\n'",
+            "mysql -h mysql_8_0 -uroot < ../build/tests/mysql/8.0/init.sql >/dev/null 2>&1",
+            "mysql -h mysql_8_0 -uroot pseudify_cp1252 < ../build/tests/mysql/8.0/data_pseudify_cp1252.sql >/dev/null 2>&1",
+            "cp ../build/tests/mysql/8.0/.env.cp1252 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-mysql-8.0-latin1.php"
+        ],
+        "test:functional:mysql:8.0:latin2": [
+            "echo '\n[TEST]: mysql:8.0:latin2\n'",
+            "mysql -h mysql_8_0 -uroot < ../build/tests/mysql/8.0/init.sql >/dev/null 2>&1",
+            "mysql -h mysql_8_0 -uroot pseudify_iso8859_2 < ../build/tests/mysql/8.0/data_pseudify_iso8859_2.sql >/dev/null 2>&1",
+            "cp ../build/tests/mysql/8.0/.env.iso8859 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-mysql-8.0-latin2.php"
+        ],
+        "test:functional:mysql:8.0:utf8": [
+            "echo '\n[TEST]: mysql:8.0:utf8\n'",
+            "mysql -h mysql_8_0 -uroot < ../build/tests/mysql/8.0/init.sql >/dev/null 2>&1",
+            "mysql -h mysql_8_0 -uroot pseudify_utf8 < ../build/tests/mysql/8.0/data_pseudify_utf8.sql >/dev/null 2>&1",
+            "cp ../build/tests/mysql/8.0/.env.utf8 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-mysql-8.0-utf8.php"
+        ],
+        "test:functional:mysql:8.0:utf8mb4": [
+            "echo '\n[TEST]: mysql:8.0:utf8mb4\n'",
+            "mysql -h mysql_8_0 -uroot < ../build/tests/mysql/8.0/init.sql >/dev/null 2>&1",
+            "mysql -h mysql_8_0 -uroot pseudify_utf8mb4 < ../build/tests/mysql/8.0/data_pseudify_utf8mb4.sql >/dev/null 2>&1",
+            "cp ../build/tests/mysql/8.0/.env.utf8mb4 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-mysql-8.0-utf8mb4.php"
+        ],
+        "test:functional:postgres:10:utf8": [
+            "echo '\n[TEST]: postgres:10:utf8\n'",
+            "psql -h postgres_10 -U postgres < ../build/tests/postgres/10/init.sql >/dev/null 2>&1",
+            "psql -h postgres_10 -U pseudify -d pseudify_utf8 < ../build/tests/postgres/10/data_pseudify_utf8.sql >/dev/null 2>&1",
+            "cp ../build/tests/postgres/10/.env.utf8 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-postgres-10-utf8.php"
+        ],
+        "test:functional:postgres:11:utf8": [
+            "echo '\n[TEST]: postgres:11:utf8\n'",
+            "psql -h postgres_11 -U postgres < ../build/tests/postgres/11/init.sql >/dev/null 2>&1",
+            "psql -h postgres_11 -U pseudify -d pseudify_utf8 < ../build/tests/postgres/11/data_pseudify_utf8.sql >/dev/null 2>&1",
+            "cp ../build/tests/postgres/11/.env.utf8 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-postgres-11-utf8.php"
+        ],
+        "test:functional:postgres:12:utf8": [
+            "echo '\n[TEST]: postgres:12:utf8\n'",
+            "psql -h postgres_12 -U postgres < ../build/tests/postgres/12/init.sql >/dev/null 2>&1",
+            "psql -h postgres_12 -U pseudify -d pseudify_utf8 < ../build/tests/postgres/12/data_pseudify_utf8.sql >/dev/null 2>&1",
+            "cp ../build/tests/postgres/12/.env.utf8 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-postgres-12-utf8.php"
+        ],
+        "test:functional:postgres:13:utf8": [
+            "echo '\n[TEST]: postgres:13:utf8\n'",
+            "psql -h postgres_13 -U postgres < ../build/tests/postgres/13/init.sql >/dev/null 2>&1",
+            "psql -h postgres_13 -U pseudify -d pseudify_utf8 < ../build/tests/postgres/13/data_pseudify_utf8.sql >/dev/null 2>&1",
+            "cp ../build/tests/postgres/13/.env.utf8 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-postgres-13-utf8.php"
+        ],
+        "test:functional:postgres:14:utf8": [
+            "echo '\n[TEST]: postgres:14:utf8\n'",
+            "psql -h postgres_14 -U postgres < ../build/tests/postgres/14/init.sql >/dev/null 2>&1",
+            "psql -h postgres_14 -U pseudify -d pseudify_utf8 < ../build/tests/postgres/14/data_pseudify_utf8.sql >/dev/null 2>&1",
+            "cp ../build/tests/postgres/14/.env.utf8 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-postgres-14-utf8.php"
+        ],
+        "test:functional:postgres:15:utf8": [
+            "echo '\n[TEST]: postgres:15:utf8\n'",
+            "psql -h postgres_15 -U postgres < ../build/tests/postgres/15/init.sql >/dev/null 2>&1",
+            "psql -h postgres_15 -U pseudify -d pseudify_utf8 < ../build/tests/postgres/15/data_pseudify_utf8.sql >/dev/null 2>&1",
+            "cp ../build/tests/postgres/15/.env.utf8 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-postgres-15-utf8.php"
+        ],
+        "test:functional:postgres:9.5:utf8": [
+            "echo '\n[TEST]: postgres:9.5:utf8\n'",
+            "psql -h postgres_9_5 -U postgres < ../build/tests/postgres/9.5/init.sql >/dev/null 2>&1",
+            "psql -h postgres_9_5 -U pseudify -d pseudify_utf8 < ../build/tests/postgres/9.5/data_pseudify_utf8.sql >/dev/null 2>&1",
+            "cp ../build/tests/postgres/9.5/.env.utf8 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-postgres-9.5-utf8.php"
+        ],
+        "test:functional:postgres:9.6:utf8": [
+            "echo '\n[TEST]: postgres:9.6:utf8\n'",
+            "psql -h postgres_9_6 -U postgres < ../build/tests/postgres/9.6/init.sql >/dev/null 2>&1",
+            "psql -h postgres_9_6 -U pseudify -d pseudify_utf8 < ../build/tests/postgres/9.6/data_pseudify_utf8.sql >/dev/null 2>&1",
+            "cp ../build/tests/postgres/9.6/.env.utf8 ../build/development/userdata/.env",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-postgres-9.6-utf8.php"
+        ],
+        "test:functional:sqlite:3:utf8": [
+            "echo '\n[TEST]: sqlite:3:utf8\n'",
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite application --coverage-php ../.build/coverage/objects/php/application-sqlite3-utf8.php"
+        ],
+        "test:prepare": [
+            "rm -f ~/.pgpass ~/.my.cnf",
+            "bin/simple-phpunit --version && export PHPUNIT_VERSION=$(bin/simple-phpunit --version | grep -Eo '([0-9]{1,}\\.)+[0-9]{1,}') && cd vendor/bin/.phpunit/phpunit && COMPOSER_ROOT_VERSION=$PHPUNIT_VERSION composer require --update-no-dev --no-progress phpspec/prophecy-phpunit:^2.0 --ignore-platform-req php --with-all-dependencies && COMPOSER_ROOT_VERSION=$PHPUNIT_VERSION composer require --update-no-dev --no-progress nimut/phpunit-merger --ignore-platform-req php"
+        ],
+        "test:unit": [
+            "phpdbg -d memory_limit=1024M -qrr bin/simple-phpunit --testsuite unit --coverage-php ../.build/coverage/objects/php/unit.php"
+        ]
+    }
+}

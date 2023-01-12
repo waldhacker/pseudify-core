@@ -1,0 +1,10 @@
+version: '3.7'
+
+services:
+  web:
+    environment:
+      MYSQL_PWD: 'pseudify(!)w4ldh4ck3r'
+      PGDATABASE: ''
+      PGHOST: ''
+      PGPASSWORD: 'pseudify(!)w4ldh4ck3r'
+      PGUSER: ''

@@ -1,0 +1,14 @@
+version: '3.7'
+
+services:
+  docker_container:
+    container_name: ddev-${DDEV_SITENAME}-docker_container
+    image: ghcr.io/waldhacker/pseudify:latest
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: $DDEV_APPROOT
+    tty: true
+    volumes:
+      - ../.build/phar/dist/:/opt/pseudify/
+      - ../build/development/userdata:/data
+      - ../build/development/entrypoint:/usr/local/bin/entrypoint

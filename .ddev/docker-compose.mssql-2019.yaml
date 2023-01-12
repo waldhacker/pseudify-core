@@ -1,0 +1,14 @@
+version: '3.7'
+
+services:
+  mssql_2019:
+    container_name: ddev-${DDEV_SITENAME}-mssql_2019
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: $DDEV_APPROOT
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: 'pseudify(!)w4ldh4ck3r'
+    ports:
+      - "10202:1433"

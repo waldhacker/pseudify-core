@@ -1,0 +1,6 @@
+framework:
+    router:
+      utf8: true
+    secret: '%env(APP_SECRET)%'
+    php_errors:
+        log: true
