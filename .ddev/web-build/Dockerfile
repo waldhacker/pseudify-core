@@ -1,5 +1,5 @@
 RUN  curl -L https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-        && curl -sLo /etc/apt/sources.list.d/mssql-release.list https://packages.microsoft.com/config/debian/$(lsb_release -rs)/prod.list \
+        && curl -sLo /etc/apt/sources.list.d/mssql-release.list https://packages.microsoft.com/config/ubuntu/22.04/prod.list \
         && apt-get update \
         && ACCEPT_EULA=Y DEBIAN_FRONTEND=noninteractive apt-get install -y -o Dpkg::Options::='--force-confnew' --no-install-recommends \
             build-essential \
@@ -10,7 +10,6 @@ RUN  curl -L https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
             php-pear \
             postgresql-client \
             unixodbc-dev \
-        && mv /opt/mssql-tools18 /opt/mssql-tools \
         && pecl install pdo_sqlsrv \
         && pecl install sqlsrv \
         \
