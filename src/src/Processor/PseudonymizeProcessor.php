@@ -87,11 +87,9 @@ class PseudonymizeProcessor
                         }
 
                         $updatedRows = $this->updateData($table, $column, $originalData, $processedData, $row, $dryRun);
-                        /*
                         if (!$dryRun && ($this->io && 0 === $updatedRows)) {
-                            $this->io->warning(sprintf('table "%s" column "%s" could not be updated!', $table->getIdentifier(), $column->getIdentifier()));
+                            // $this->io->warning(sprintf('table "%s" column "%s" could not be updated!', $table->getIdentifier(), $column->getIdentifier()));
                         }
-                        */
                     }
                 }
             }
