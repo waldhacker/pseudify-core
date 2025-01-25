@@ -1,3 +1,10 @@
+:warning:
+
+**This repository is no longer maintained. Use the improved successor [pseudify-ai](https://github.com/waldhacker/pseudify-ai)**
+
+:warning:
+
+
 [![Build](https://github.com/waldhacker/pseudify-core/actions/workflows/build-and-release.yml/badge.svg)](https://github.com/waldhacker/pseudify-core/actions/workflows/build-and-release.yml)
 
 **Pseudify** is a toolbox that helps you to pseudonymize database data.  
